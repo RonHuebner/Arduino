@@ -1,106 +1,160 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="en">
-
 <head>
-  <style media="screen" type="text/css">
-    /* Common stuff */
+  <title>Wall Light Control Web Server</title>
+  <link rel="icon" href="data:,">
+  <style>
+  html {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.8rem;
+    color: white;
+  }
+  h2{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #143642;
+  }
+  .topnav {
+    overflow: hidden;
+    background-color: #143642;
+  }
+  body {
+    margin: 0;
+  }
+  .content {
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
 
-    .slidecontainer {
-      width: 100%;
-      /* Width of the outside container */
-    }
+  .card {
+    background-color: #F8F7F9;;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+    padding-top:10px;
+    padding-bottom:20px;
+    padding: 30px;
+  }
+  .slidecontainer {
+  width: 100%;
+  margin: 0 auto;
+  }
 
-    /* The slider itself */
-    .slider {
-      -webkit-appearance: none;
-      /* Override default CSS styles */
-      appearance: none;
-      width: 100%;
-      /* Full-width */
-      height: 25px;
-      /* Specified height */
-      background: #d3d3d3;
-      /* Grey background */
-      outline: none;
-      /* Remove outline */
-      opacity: 0.7;
-      /* Set transparency (for mouse-over effects on hover) */
-      -webkit-transition: .2s;
-      /* 0.2 seconds transition on hover */
-      transition: opacity .2s;
-    }
+  .slider {
+    -webkit-appearance: none;
+    width: 60%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
 
-    /* Mouse-over effects */
-    .slider:hover {
-      opacity: 1;
-      /* Fully shown on mouse-over */
-    }
+  .slider:hover {
+    opacity: 1;
+  }
 
-    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      /* Override default look */
-      appearance: none;
-      width: 25px;
-      /* Set a specific slider handle width */
-      height: 25px;
-      /* Slider handle height */
-      background: #04AA6D;
-      /* Green background */
-      cursor: pointer;
-      /* Cursor on hover */
-    }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+  }
 
-    .slider::-moz-range-thumb {
-      width: 25px;
-      /* Set a specific slider handle width */
-      height: 25px;
-      /* Slider handle height */
-      background: #04AA6D;
-      /* Green background */
-      cursor: pointer;
-      /* Cursor on hover */
-    }
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+  }
+
+
+  .button {
+    padding: 15px 50px;
+    font-size: 24px;
+    text-align: center;
+    outline: none;
+    color: #fff;
+    background-color: #0f8b8d;
+    border: none;
+    border-radius: 5px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+   }
+   /*.button:hover {background-color: #0f8b8d}*/
+   .button:active {
+     background-color: #0f8b8d;
+     box-shadow: 2 2px #CDCDCD;
+     transform: translateY(2px);
+   }
+   .state {
+     font-size: 1.5rem;
+     color:#8c8c8c;
+     font-weight: bold;
+   }
   </style>
-
 </head>
 
 <body>
-
+  <div class="topnav">
+    <h1>Dolphin Art Light Controller</h1>
+  </div>
+  <br>
   <!-- visible page stuff-->
   <br>
-  <button id="myButton" class="float-left submit-button" value="1">On</button>
+  <!-- <button id="myButton" class="float-center submit-button" value="1">On</button>-->
+  <button id="myButton" class="button" value="1">On</button>
   <br>
   <br>
   <strong>Spotlight colors</strong>
   <br>
+  <br> 
   <!-- slider "myRangeRed" -->
-  <div class="slidecontainer" style="width:300px">
-    <input type="range" min="0" max="255" value="0" class="slider" id="myRangeRed">
+  <div class="slidecontainer" style="width:500px" style="text-align:center">
+    R: <input type="range" min="0" max="255" value="0" class="slider" id="myRangeRed">
   </div>
   Red value = <span id="rangeValueRed">0</span>
   <br>
+  <br>
   <!-- slider "myRangeGreen" -->
-  <div class="slidecontainer" style="width:300px">
-    <input type="range" min="0" max="255" value="0" class="slider" id="myRangeGreen">
+  <div class="slidecontainer" style="width:500px">
+    G: <input type="range" min="0" max="255" value="0" class="slider" id="myRangeGreen">
   </div>
   Green value = <span id="rangeValueGreen">0</span>
   <br>
-  <!-- slider "myRangeBlue" -->
-  <div class="slidecontainer" style="width:300px">
-    <input type="range" min="0" max="255" value="20" class="slider" id="myRangeBlue">
+  <br>
+   <!-- slider "myRangeBlue" -->
+  <div class="slidecontainer" style="width:500px">
+    B: <input type="range" min="0" max="255" value="20" class="slider" id="myRangeBlue">
   </div>
-  Blue value = <span id="rangeValueBlue">20</span> <br>
+  Blue value = <span id="rangeValueBlue">20</span>
+  <br>
+  <br>
   <!-- slider "myRangeWhite" -->
-  <div class="slidecontainer" style="width:300px">
-    <input type="range" min="0" max="255" value="80" class="slider" id="myRangeWhite">
+  <div class="slidecontainer" style="width:500px">
+    W: <input type="range" min="0" max="255" value="80" class="slider" id="myRangeWhite">
   </div>
   White value = <span id="rangeValueWhite">80</span> <br> <br>
   <br>
-  <strong>Animation type</strong>
+  <br>
+  <strong>Animation control</strong>
   <br>
   <br>
   <!-- text select -->
+  <label for="mySelect">Choose transition:</label>
   <select id="mySelect">
     <option value="1">NeoEase::Linear</option>
     <option value="2">NeoEase::QuadraticInOut</option>
@@ -115,19 +169,25 @@
   <br>
   <br>
   <!-- slider "myRangeBright" -->
-    <div class="slidecontainer" style="width:300px">
+    <div class="slidecontainer" style="width:500px">
         <input type="range" min="0" max="100" value="100" class="slider" id="myRangeBright">
         </div>
         Brightness value = <span id="rangeValueBright">100</span>
   <br>
   <br>
   <!-- slider "myRangeTime" -->
-  <div class="slidecontainer" style="width:300px">
+  <div class="slidecontainer" style="width:500px">
     <input type="range" min="0" max="300" value="75" class="slider" id="myRangeTime">
     </div>
     Animation time value = <span id="rangeValueTime">75</span>
   <br>
-  <br>  <button id="myPostButton" class="float-left submit-button">Update</button>
+  <br>
+  <div class="content">
+    <div class="card">
+      <!-- <p class="status">Controller status: <span id="status">IP address: - / RSSI: -</span></p> -->
+      <p><button id="myPostButton" class="button">Update</button></p>
+    </div>
+  </div>
 
   <!-- javascript stuff-->
   <script>

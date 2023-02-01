@@ -248,20 +248,22 @@ void InitWater() {
 }
 
 void SetupAnimationSet() {
-    //Serial.println("SetupAnimationSet starts");
-    // setup the animations for each pixel
-    for (uint16_t pix = 0; pix < Pixels; pix++)
-    {
-      // starting state is the starting color set myColors
-      animationState[pix].StartingColor = GetColors(myColors[pix]);
-      // end state is color of the next pixel
-      animationState[pix].EndingColor = GetColors(nextColors[pix]);       
-      // use the specific curve
-      animationState[pix].Easeing = moveEase;
-      // now use the animation states we just created and start the animation
-      // which will continue to run and call the update function until it completes
-      animations.StartAnimation(pix, animationTime, AnimationUpdate); 
-    }
+  //Serial.println("SetupAnimationSet starts");
+  // setup the animations for each pixel
+  for (uint16_t pix = 0; pix < Pixels; pix++)
+  {
+    // starting state is the starting color set myColors
+    animationState[pix].StartingColor = GetColors(myColors[pix]);
+    // end state is color of the next pixel
+    animationState[pix].EndingColor = GetColors(nextColors[pix]);       
+    // use the specific curve
+    animationState[pix].Easeing = moveEase;
+    // now use the animation states we just created and start the animation
+    // which will continue to run and call the update function until it completes
+    animations.StartAnimation(pix, animationTime, AnimationUpdate); 
+  }
+  // setup the master loop timing object, last object
+  animations.StartAnimation(Pixels, animationTime, LoopAnimUpdate);
 }
 
 void ConnectToWifi() {
@@ -380,7 +382,7 @@ void RecallPreferences() {
 
 void setup() {
   // Setup Serial Monitor
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("initialize");
 
   // Open Preferences with PrefStore namespace. We will open storage in
@@ -422,6 +424,12 @@ void setup() {
 
 
 void loop () {
-
-  delay(10);
+  if(onOff == 0) {  
+    strip.ClearTo(RgbwColor(0,0,0,0));
+  }
+  else {
+    animations.UpdateAnimations();
+  }
+  strip.Show(); 
+  //delay(10);
 }
