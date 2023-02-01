@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <title>Wall Light Control Web Server</title>
+  <link rel="icon" href="data:,">
+  <style>
+  html {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.8rem;
+    color: white;
+  }
+  h2{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #143642;
+  }
+  .topnav {
+    overflow: hidden;
+    background-color: #143642;
+  }
+  body {
+    margin: 0;
+  }
+  .content {
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .card {
+    background-color: #F8F7F9;;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+    padding-top:10px;
+    padding-bottom:20px;
+  }
+
+
+  
+  .button {
+    padding: 15px 50px;
+    font-size: 24px;
+    text-align: center;
+    outline: none;
+    color: #fff;
+    background-color: #0f8b8d;
+    border: none;
+    border-radius: 5px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+   }
+   /*.button:hover {background-color: #0f8b8d}*/
+   .button:active {
+     background-color: #0f8b8d;
+     box-shadow: 2 2px #CDCDCD;
+     transform: translateY(2px);
+   }
+   .state {
+     font-size: 1.5rem;
+     color:#8c8c8c;
+     font-weight: bold;
+   }
+  </style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+</head>
+<body>
+  <div class="topnav">
+    <h1>Wall Light Controller</h1>
+  </div>
+  <br>
+  <label for="StyleSelect">Choose a effect style:</label>
+
+  <select name="style" id="StyleSelect">
+      <option value="">--Please choose an option--</option>
+      <option value="0">turn off</option>
+      <option value="1">constant color (color 1)</option>
+      <option value="2">chasing colors (1 to 5 colors)</option>
+      <option value="3">waterfall colors (1 to 5 colors)</option>
+      <option value="4">rainbow (no colors needed)</option>
+  </select>   
+  <br>
+  <br>
+  <label for="SpeedSelect">Choose a effect speed:</label>
+
+  <select name="speed" id="SpeedSelect">
+      <option value="">--Please choose the effect speed--</option>
+      <option value="0">slow</option>
+      <option value="1">medium</option>
+      <option value="2">fast</option>
+      <option value="3">maximum</option>
+  </select>   
+  <br>
+  <p>Select up to 5 colors:</p>
+    <div>
+        <input type="color" id="Color0" name="Color0"
+            value="#000000">
+        <label for="Color0">Color 1</label>
+    </div>
+
+    <div>
+        <input type="color" id="Color1" name="Color1"
+                value="#000000">
+        <label for="Color1">Color 2</label>
+    </div>
+    <div>
+        <input type="color" id="Color2" name="Color2"
+            value="#000000">
+        <label for="Color2">Color 3</label>
+    </div>
+
+    <div>
+        <input type="color" id="Color3" name="Color3"
+                value="#000000">
+        <label for="Color3">Color 4</label>
+    </div>
+    <div>
+        <input type="color" id="Color4" name="Color4"
+            value="#000000">
+        <label for="Color4">Color 5</label>
+    </div>
+  <br>
+
+  <div class="content">
+    <div class="card">
+      <p class="status">Controller status: <span id="status">IP address: - / RSSI: -</span></p>
+      <p><button id="button" class="button">Update</button></p>
+    </div>
+  </div>
+ 
+<script>
+  var gateway = `ws://${window.location.hostname}/ws`;
+  var websocket;
+  window.addEventListener('load', onLoad);
+  function initWebSocket() {
+    console.log('Trying to open a WebSocket connection...');
+    websocket = new WebSocket(gateway);
+    websocket.onopen    = onOpen;
+    websocket.onclose   = onClose;
+    websocket.onmessage = onMessage; // <-- add this line
+  }
+  function onOpen(event) {
+    console.log('Connection opened');
+  }
+  function onClose(event) {
+    console.log('Connection closed');
+    setTimeout(initWebSocket, 5000);
+  }
+  function onMessage(event) {
+    document.getElementById('status').innerHTML = event.data;
+  }
+  function onLoad(event) {
+    initWebSocket();
+    initButton();
+  }
+  function initButton() {
+    document.getElementById('button').addEventListener('click', sendParams);
+  }
+
+  function sendParams(){
+    var str = return_parameter_string();
+    console.log(str);
+    websocket.send(str);
+  }
+
+  var http = new XMLHttpRequest();
+  function post_without_reload(path, params, method) {
+    if (http) {
+      http.abort();
+    }
+    http = new XMLHttpRequest();
+    http.open(method, path, true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.send(params);
+  }
+
+  function return_parameter_string() {
+      var val;
+      if (!document.getElementById("SpeedSelect").value) {
+        document.getElementById("SpeedSelect").value=0;
+      }
+      if (!document.getElementById("StyleSelect").value) {
+        document.getElementById("StyleSelect").value=0;
+      }
+      val = "style=" + document.getElementById("StyleSelect").value + 
+           "&speed=" + document.getElementById("SpeedSelect").value + 
+           "&color0=" + document.getElementById("Color0").value +
+           "&color1=" + document.getElementById("Color1").value +
+           "&color2=" + document.getElementById("Color2").value +
+           "&color3=" + document.getElementById("Color3").value +
+           "&color4=" + document.getElementById("Color4").value;
+      return val;
+  }
+</script>
+</body>
+</html>
