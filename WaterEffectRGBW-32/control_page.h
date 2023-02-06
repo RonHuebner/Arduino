@@ -1,7 +1,7 @@
 const char HTML[] PROGMEM = "<!DOCTYPE HTML>\n"
 "<html lang=\"en\">\n"
 "<head>\n"
-"  <title>Wall Light Control Web Server</title>\n"
+"  <title>Dolphin Light Control Web Server</title>\n"
 "  <link rel=\"icon\" href=\"data:,\">\n"
 "  <style>\n"
 "  html {\n"
