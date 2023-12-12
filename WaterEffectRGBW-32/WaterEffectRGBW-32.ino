@@ -16,6 +16,9 @@
 //   pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
 //   and minimize distance between Arduino and first pixel.  Avoid connecting
 //   on a live circuit...if you must, connect GND first.#include <Arduino.h>
+//
+// Control page is dolphinlight.local
+//
 
 #include <WiFi.h>
 #include <AsyncTCP.h>

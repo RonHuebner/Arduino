@@ -73,7 +73,8 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 // Variables to store the most recent color sent to us by the client (i.e a web browser)
-RgbwColor color[] = {RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0)};
+RgbwColor color[] = {RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),
+          RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0),RgbwColor(0,0,0,0)};
 int speedType = 1;
 int styleType = 1;
 uint16_t animationTime = 100;  // duration of the animation, centiseconds
@@ -85,6 +86,7 @@ int rowShift = 0;
 int offSet = 0;
 int currentStyleType = styleType;
 int currentSpeed = speedType;
+int colorWidth = 18;
 RgbwColor nextColors[Pixels];
 RgbwColor myColors[Pixels];
 RgbwColor rainbow[Pixels];
@@ -94,6 +96,10 @@ String strColor1;
 String strColor2;
 String strColor3;
 String strColor4;
+String strColor5;
+String strColor6;
+String strColor7;
+String strColor8;
 struct MyAnimationState
 {
     RgbwColor StartingColor;  // the color the animation starts at
@@ -213,30 +219,42 @@ int GetNextColor(int i) {
   return j;  
 }
 
-void ChasingColors(){
+void ChasingColorsWide(){
+  //Serial.println("*** starting ChasingColorsWide");
   moveEase = NeoEase::CubicInOut;
+  
   int a[Pixels];
   int b[Pixels];
   int k;
   k = startingColor;
   // fill arrays
-  for (int i=0; i < Pixels; i+=2) {
-    a[i] = k;
-    a[i+1] = k;
-    b[i] = GetPriorColor(k);
-    b[i+1] = k;     
-    if(offSet==1) {
-      a[i+1] = GetNextColor(k);
-      b[i] = k;
+  //Serial.println("filling arrays");
+  //Serial.println(" colorWidth="+String(colorWidth));
+  for (int i=0; i < Pixels; i+=colorWidth) {
+    //Serial.println("   i="+String(i));
+    //Serial.println("    k="+String(k));
+    for (int j=0; j<colorWidth; j++) {
+      //Serial.println("      j="+String(j));
+      a[i+j] = k;
+      b[i+j] = k;        
     }
     k=GetNextColor(k);    
+    b[i+colorWidth-1] = k;
   }
+
+  // for (int i=0; i < Pixels; i++) {
+  //   Serial.print("a["+String(i)+"]="+String(a[i]));
+  //   Serial.println("  b["+String(i)+"]="+String(b[i]));
+  // }
 
   for (int i=0; i < Pixels; i++) { 
-      myColors[i] = color[a[i]];
-      nextColors[i] = color[b[i]];  
+    k=i+offSet;
+    if(k>=Pixels) {
+      k=k-Pixels;
+    }
+    myColors[i] = color[a[k]];
+    nextColors[i] = color[b[k]];  
   }
-
 }
 
 void RainbowEffect() {
@@ -264,7 +282,12 @@ void LoopAnimUpdate(const AnimationParam& param) {
 void SetupAnimationSet() {
   //count active colors
   activeColors = 0;
-  activeColors = isActive(color[0]) + isActive(color[1]) + isActive(color[2]) + isActive(color[3]) + isActive(color[4]);  
+  for (uint16_t i = 0; i < 9; i++)
+  {
+    activeColors += isActive(color[i]) ;
+  }
+  //Serial.println("  activeColors="+String(activeColors)) ;
+
   moveEase = NeoEase::Linear;  //default  
   // Set lights and increment annimation to next position
   switch (styleType) {
@@ -281,14 +304,10 @@ void SetupAnimationSet() {
       }
       break;
     case 2:  //chasing
-      ChasingColors();
-      // increment starting color
+      ChasingColorsWide();
+      // increment starting point
       offSet=offSet+1;
-      if(offSet>=2)offSet = 0; 
-      if(offSet==1) {
-        startingColor=startingColor-1;
-        if(startingColor<0)startingColor = activeColors-1;
-      }
+      if(offSet>=Pixels)offSet = 0; 
       break;
     case 3:  //waterfall
       VerticalShift();
@@ -332,6 +351,24 @@ void SetAnimationTime(int speed) {
     case 3: // maximum     
       animationTime = 10;
       break;
+  }
+  //tweak animation time for effects
+  switch (styleType) {
+    case 0:  //off
+      break;
+    case 1:  //solid color, use color[0]
+      break;
+    case 2:  //chasing
+      animationTime = animationTime*0.5;
+      break;
+    case 3:  //waterfall
+      animationTime = animationTime*2.0; 
+      break;    
+    case 4:  //rainbow
+      animationTime = animationTime*0.5;
+      break;
+    default:
+      break; 
   }
   // setup the master loop timing object, last object
   animations.StartAnimation(Pixels, animationTime, LoopAnimUpdate);
@@ -388,12 +425,13 @@ String getParsedValue(String data, char separator, int index) {
 
 void ApplyUpdatesFromWeb(String message) {
   //parse message for parameters
-  // Example: style=1&speed=1&color1=#000000&color2=#000000&color3=#000000&color4=#000000&color5=#000000
+  // Example: style=1&speed=1&color1=#000000&color2=#000000&color3=#000000&color4=#000000&color5=#000000...
   String result;
   String key;
   String value;
+  int valuesInMessage = 11;
   int x;
-  for(int i=0; i<7; i++){
+  for(int i=0; i<valuesInMessage; i++){
     result = getParsedValue(message,'&', i);
     Serial.println(String(i)+" "+result);
     // parse result for key and value
@@ -412,24 +450,48 @@ void ApplyUpdatesFromWeb(String message) {
     else if(key == "color0"){
       strColor0 = value;
       color[0] = SetColorFromString(value);
+      Serial.println("Setting color[0]"); 
     }
     else if(key == "color1"){
       strColor1 = value;
       color[1] = SetColorFromString(value);
+      Serial.println("Setting color[1]"); 
     }
     else if(key == "color2"){
       strColor2 = value;
       color[2] = SetColorFromString(value);
+      Serial.println("Setting color[2]"); 
     }
     else if(key == "color3"){
       strColor3 = value;
       color[3] = SetColorFromString(value);
+      Serial.println("Setting color[3]"); 
     }
     else if(key == "color4"){
       strColor4 = value;
       color[4] = SetColorFromString(value);
+      Serial.println("Setting color[4]"); 
     }
-
+    else if(key == "color5"){
+      strColor5 = value;
+      color[5] = SetColorFromString(value);
+      Serial.println("Setting color[5]"); 
+    }
+    else if(key == "color6"){
+      strColor6 = value;
+      color[6] = SetColorFromString(value);
+      Serial.println("Setting color[6]"); 
+    }
+    else if(key == "color7"){
+      strColor7 = value;
+      color[7] = SetColorFromString(value);  
+      Serial.println("Setting color[7]");
+    }
+    else if(key == "color8"){
+      strColor8 = value;
+      color[8] = SetColorFromString(value);  
+      Serial.println("Setting color[8]");   
+    }
   }
   Serial.println();
   SavePreferences();
@@ -500,6 +562,10 @@ void SavePreferences() {
   preferences.putString("color2", strColor2);
   preferences.putString("color3", strColor3);
   preferences.putString("color4", strColor4);
+  preferences.putString("color5", strColor5);
+  preferences.putString("color6", strColor6);
+  preferences.putString("color7", strColor7);
+  preferences.putString("color8", strColor8);
   preferences.putInt("style", styleType);
   preferences.putInt("speed", speedType);
 
@@ -513,6 +579,10 @@ void RecallPreferences() {
   color[2] = SetColorFromString(preferences.getString("color2", "#000000"));
   color[3] = SetColorFromString(preferences.getString("color3", "#000000"));
   color[4] = SetColorFromString(preferences.getString("color4", "#000000"));
+  color[5] = SetColorFromString(preferences.getString("color5", "#000000"));
+  color[6] = SetColorFromString(preferences.getString("color6", "#000000"));
+  color[7] = SetColorFromString(preferences.getString("color7", "#000000"));
+  color[8] = SetColorFromString(preferences.getString("color8", "#000000"));
   styleType = preferences.getInt("style", 1);
   speedType = preferences.getInt("speed", 1);
   SetAnimationTime(speedType);

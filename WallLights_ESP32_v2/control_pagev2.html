@@ -82,8 +82,8 @@
       <option value="">--Please choose an option--</option>
       <option value="0">turn off</option>
       <option value="1">constant color (color 1)</option>
-      <option value="2">chasing colors (1 to 5 colors)</option>
-      <option value="3">waterfall colors (1 to 5 colors)</option>
+      <option value="2">chasing colors (1 to 9 colors)</option>
+      <option value="3">waterfall colors (1 to 9 colors)</option>
       <option value="4">rainbow (no colors needed)</option>
   </select>   
   <br>
@@ -98,13 +98,12 @@
       <option value="3">maximum</option>
   </select>   
   <br>
-  <p>Select up to 5 colors:</p>
+  <p>Select up to 9 colors:</p>
     <div>
         <input type="color" id="Color0" name="Color0"
             value="#000000">
         <label for="Color0">Color 1</label>
     </div>
-
     <div>
         <input type="color" id="Color1" name="Color1"
                 value="#000000">
@@ -115,7 +114,6 @@
             value="#000000">
         <label for="Color2">Color 3</label>
     </div>
-
     <div>
         <input type="color" id="Color3" name="Color3"
                 value="#000000">
@@ -126,7 +124,27 @@
             value="#000000">
         <label for="Color4">Color 5</label>
     </div>
-  <br>
+    <div>
+        <input type="color" id="Color5" name="Color5"
+            value="#000000">
+        <label for="Color5">Color 6</label>
+    </div>
+    <div>
+        <input type="color" id="Color6" name="Color6"
+              value="#000000">
+        <label for="Color6">Color 7</label>
+    </div>
+    <div>
+        <input type="color" id="Color7" name="Color7"
+              value="#000000">
+        <label for="Color7">Color 8</label>
+    </div>
+    <div>
+      <input type="color" id="Color8" name="Color8"
+            value="#000000">
+      <label for="Color8">Color 9</label>
+     </div>
+    <br>
 
   <div class="content">
     <div class="card">
@@ -195,7 +213,11 @@
            "&color1=" + document.getElementById("Color1").value +
            "&color2=" + document.getElementById("Color2").value +
            "&color3=" + document.getElementById("Color3").value +
-           "&color4=" + document.getElementById("Color4").value;
+           "&color4=" + document.getElementById("Color4").value +
+           "&color5=" + document.getElementById("Color5").value +
+           "&color6=" + document.getElementById("Color6").value +
+           "&color7=" + document.getElementById("Color7").value +
+           "&color8=" + document.getElementById("Color8").value;
       return val;
   }
 </script>
