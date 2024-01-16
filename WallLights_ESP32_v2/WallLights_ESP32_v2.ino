@@ -4,6 +4,7 @@
 //  Lights: Strip of BTF-LIGHTING RGBWW Warm White SK6812 60 Pixels/m
 //  Web page HTML code from control_page.h as const char HTML[] PROGMEM
 //  Web page conversion: http://tomeko.net/online_tools/cpp_text_escape.php?lang=en 
+
 //  OTA update page: server IP/update, select precompiled BIN file created with: 
 //  (Arduino IDE/Sketch/Export compiled binary)
 
@@ -15,6 +16,7 @@
 //   pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
 //   and minimize distance between Arduino and first pixel.  Avoid connecting
 //   on a live circuit...if you must, connect GND first.#include <Arduino.h>
+
 
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -531,7 +533,7 @@ RgbwColor SetColorFromString(String val){
   // limit brightness to prevent overheating
   if(colorSum>120) {
     float factor = 120.0/(float)colorSum;
-    Wo=Wo * factor;
+    Wo=Wo * factor * 0.5;  //white is too intense
     Ro=Ro * factor;
     Go=Go * factor;
     Bo=Bo * factor;;  
